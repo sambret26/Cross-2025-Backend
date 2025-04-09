@@ -7,8 +7,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '../.env'))
 log_timezone = timezone(os.getenv('TIME_ZONE'))
 
-BOT = 'BOT'
 CONFIG = '[CONFIG]'
+HANDLE = '[HANDLE]'
+DEBUG = '[DEBUG]'
+MAIL = '[MAIL]'
+BOT = '[BOT]'
 
 class Log:
     def __init__(self):
