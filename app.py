@@ -7,7 +7,8 @@ from flask_cors import CORS
 
 # Pour importer sans Blueprint
 from models.Runner import Runner
-from models.Settings import Settings
+from models.Setting import Setting
+from models.Channel import Channel
 
 app = Flask(__name__)
 CORS(app)
