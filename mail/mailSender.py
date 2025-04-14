@@ -1,8 +1,8 @@
-import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
+import smtplib
 import os
 
 from repositories.SettingRepository import SettingRepository
@@ -13,8 +13,8 @@ from config import Config
 settingRepository = SettingRepository()
 
 def sendMail():
-    fromAdress = settingRepository.getFromAdress()
-    toAdress = settingRepository.getToAdress()
+    fromAdress = settingRepository.getValue('FromAdress')
+    toAdress = settingRepository.getValue('ToAdress')
     if fromAdress == None:
         log.error(MAIL, messages.ERROR_FETCHING_FROM_ADRESS)
         return None

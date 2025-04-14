@@ -1,7 +1,5 @@
 from models.Runner import Runner
-
 from database import db
-
 
 class RunnerRepository:
     

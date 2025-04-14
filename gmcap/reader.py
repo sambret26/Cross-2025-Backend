@@ -1,11 +1,10 @@
 from repositories.SettingRepository import SettingRepository
 from repositories.ChannelRepository import ChannelRepository
 from repositories.RunnerRepository import RunnerRepository
+from discord.discordFunctions import replaceOffsetValues
+from logger.logger import log, HANDLE, DEBUG, DISCORD
 from models.Runner import Runner
-
-from logger.logger import log, HANDLE, DEBUG
 from constants import messages
-from config import Config
 
 settingRepository = SettingRepository()
 channelRepository = ChannelRepository()
@@ -88,10 +87,17 @@ def handle(runner, runnersMap, runnersToAdd, runnersToUpdate):
         runnersToAdd.append(runner)
     
 async def findHour(bot, a, b, c, offsets, i):
-    if Config.DEBUG and i==0 :
-        channelId = channelRepository.getDebugChannelId()
+    debug = settingRepository.getValue('Debug')
+    if debug == None:
+        log.error(DISCORD, messages.DEBUG_ERROR)
+        return
+    if debug.value == "1" and i==0 :
+        channelId = channelRepository.getChannelId("Debug")
+        if channelId == None:
+            log.error(DISCORD, messages.CHANNEL_ERROR)
+            return
         channel = bot.get_channel(channelId)
-        message = messages.OFFSETS.replace("A", str(a)).replace("B", str(b)).replace("C", str(c))
+        message = replaceOffsetValues(messages.OFFSETS, [a, b, c])
         await channel.send(message)
         log.info(DEBUG, message)
     if a==0 and b==0 and c==0 : return None
@@ -146,8 +152,8 @@ async def handleFile(bot, filename):
         number = readIntWithFixLen(file, 2)
         if number == 0 :
             return
-        settingRepository.setRunnerNumber(number)
-        offsetsInDb = settingRepository.getOffsets()
+        settingRepository.setValue('RunnerNumber', number)
+        offsetsInDb = settingRepository.getValue('Offsets')
         if offsetsInDb == None:
             log.error(HANDLE, messages.ERROR_OFFSET)
             return None

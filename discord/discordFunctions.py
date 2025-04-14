@@ -1,24 +1,29 @@
+import discord
+import re
+
 from repositories.SettingRepository import SettingRepository
 from repositories.ChannelRepository import ChannelRepository
 from repositories.RunnerRepository import RunnerRepository
-from logger.logger import log, HANDLE, MAIL
+from logger.logger import log, HANDLE, MAIL, DISCORD
 from constants import messages, settings
 from models.Runner import Runner
 from word import wordHandler
 from mail import mailSender
-import discord
 
 settingRepository = SettingRepository()
 channelRepository = ChannelRepository()
 runnerRepository = RunnerRepository()
 
 async def updateResultMessage(bot):
-    channelId = channelRepository.getResultChannelId()
+    channelId = channelRepository.getChannelId("Result")
+    if channelId == None:
+        log.error(DISCORD, messages.CHANNEL_ERROR)
+        return
     channel = bot.get_channel(channelId)
     rewards = getRewards()
     await checkRewards(channel, rewards)
     count = runnerRepository.count()
-    number = settingRepository.getRunnerNumber()
+    number = settingRepository.getValue('RunnerNumber')
     if count == None or number == None:
         log.error(HANDLE, messages.COUNT_ERROR)
         return
@@ -30,7 +35,7 @@ async def updateResultMessage(bot):
     await channel.send(newMessage)
 
 async def checkRewards(channel, rewards):
-    rewardInDB = settingRepository.getRewardsNumber()
+    rewardInDB = settingRepository.getValue('RewardsNumber')
     if rewardInDB == None:
         await channel.send(messages.ERROR_REWARD)
         return
@@ -40,8 +45,8 @@ async def checkRewards(channel, rewards):
             rewardsNumber+=1
     if rewardsNumber == int(rewardInDB.value):
         return
-    settingRepository.setRewardsNumbers(rewardsNumber)
-    totalRewardsCounter = settingRepository.getTotalRewardsCounter()
+    settingRepository.setValue('RewardsNumber', rewardsNumber)
+    totalRewardsCounter = settingRepository.getValue('TotalRewardsCounter')
     if totalRewardsCounter == None:
         log.error(HANDLE, messages.ERROR_TOTAL_REWARD)
         return
@@ -116,3 +121,34 @@ def getValues(reward):
     if time.startswith("00:"):
         time = time[3:]
     return (reward[0], r.sex, r.ranking, r.last_name, r.first_name, r.bib_number, time)
+
+def isCorrectEmail(adress):
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return bool(re.match(pattern, adress))
+
+def getOffsetsMessages(offsets):
+    message = replaceOffsetValues(messages.OFFSETS, offsets)
+    message += messages.OFFSETS_CMD
+    return message
+
+def replaceOffsetValues(message, offsets):
+    message = message.replace("A", str(offsets[0]))
+    message = message.replace("B", str(offsets[1]))
+    message = message.replace("C", str(offsets[2]))
+    return message
+
+def getOffsetsFromArgs(args):
+    if len(args) == 1:
+        try:
+            offsets = args[0].split(',')
+            if len(offsets) != 3:
+                return None
+            return [int(offset) for offset in offsets]
+        except:
+            return None
+    if len(args) == 3:
+        try:
+            return [int(arg) for arg in args]
+        except:
+            return None
+    return None

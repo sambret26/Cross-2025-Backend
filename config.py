@@ -11,7 +11,6 @@ class Config:
     DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
     DISCORD_GUILD_ID = os.getenv('DISCORD_GUILD_ID')
     TIME_ZONE = os.getenv('TIME_ZONE')
-    DEBUG = int(os.getenv('DEBUG'))
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
 
     def __init__(self):

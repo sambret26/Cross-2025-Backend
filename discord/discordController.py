@@ -1,9 +1,13 @@
-from config import Config
-from discord import Intents
 from discord.ext import commands
+from discord import Intents
+
+from repositories.SettingRepository import SettingRepository
+from logger.logger import log, BOT, DISCORD
 from discord import discordBusiness
-from logger.logger import log, BOT
 from constants import messages
+from config import Config
+
+settingRepository = SettingRepository()
 
 DISCORD_GUILD_ID = int(Config.DISCORD_GUILD_ID)
 
@@ -27,8 +31,32 @@ async def file(ctx):
     await discordBusiness.file(ctx)
 
 @bot.command()
+async def fromAdress(ctx, *args):
+    await discordBusiness.fromAdress(ctx, args)
+
+@bot.command()
+async def toAdress(ctx, *args):
+    await discordBusiness.toAdress(ctx, args)
+
+@bot.command()
+async def offsets(ctx, *args):
+    await discordBusiness.offsets(ctx, args)
+
+@bot.command()
+async def totalRewards(ctx, *args):
+    await discordBusiness.totalRewards(ctx, args)
+
+@bot.command()
+async def debug(ctx, *args):
+    await discordBusiness.debug(ctx, args)
+
+@bot.command()
+async def cmd(ctx):
+    await discordBusiness.cmd(ctx)
+
+@bot.command()
 async def clear(ctx, nombre: int = 100):
-    await discordBusiness.clear(ctx, nombre) 
+    await discordBusiness.clear(ctx, nombre)
 
 @bot.event
 async def on_ready():
@@ -45,7 +73,11 @@ async def on_message(message):
     await bot.process_commands(message)
 
 def main():
-    if Config.DEBUG:
+    debug = settingRepository.getValue('Debug')
+    if debug == None:
+        log.error(DISCORD, messages.DEBUG_ERROR)
+        return
+    if debug.value == "1":
         log.info(BOT, messages.DEBUG_START)
     else:
         log.info(BOT, messages.CLASSIC_START)
