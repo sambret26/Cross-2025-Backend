@@ -2,6 +2,7 @@ from discord.ext import commands
 from discord import Intents
 
 from repositories.SettingRepository import SettingRepository
+from discord import discordFunctions as functions
 from logger.logger import log, BOT, DISCORD
 from discord import discordBusiness
 from constants import messages
@@ -73,6 +74,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
 def main():
+    functions.initData()
     debug = settingRepository.getValue('Debug')
     if debug == None:
         log.error(DISCORD, messages.DEBUG_ERROR)

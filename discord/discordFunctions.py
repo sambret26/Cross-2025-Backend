@@ -152,3 +152,9 @@ def getOffsetsFromArgs(args):
         except:
             return None
     return None
+
+def initData():
+    for data in settings.DATAS:
+        value = settingRepository.getValue(data[0])
+        if value == None:
+            settingRepository.addValue(data[0], data[1])

@@ -28,4 +28,4 @@ discordThread = threading.Thread(target=runDiscordBot)
 discordThread.start()
 
 if __name__ == '__main__':
-    app.run
+    app.run()

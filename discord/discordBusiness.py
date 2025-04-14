@@ -27,7 +27,7 @@ async def importFile(bot, message):
     end = time.time()
     execution = end - start
     duration = f"{execution:.2f}"
-    await sendSecondReact(message)
+    await sendSecondReact(bot, message)
     await message.channel.send(messages.FILE_TREATED.replace("PC_NAME", Config.PC_NAME).replace("DURATION", duration))
     await functions.updateResultMessage(bot)
 
@@ -102,9 +102,9 @@ async def offsets(ctx, args):
     if offsets == None:
         await ctx.send(messages.INVALID_OFFSETS)
     else:
-        offsetsValues = ",".join([offset for offset in offsets])
+        offsetsValues = ",".join([str(offset) for offset in offsets])
         settingRepository.setValue('Offsets', offsetsValues)
-        message = functions.replaceOffsetValues(message.OFFSETS_SET, offsets)
+        message = functions.replaceOffsetValues(messages.OFFSETS_SET, offsets)
         await ctx.send(message)
 
 async def totalRewards(ctx, args):
@@ -148,7 +148,7 @@ async def sendFirstReact(message):
     except:
         None
 
-async def sendSecondReact(message):
+async def sendSecondReact(bot, message):
     try:
         await message.remove_reaction("🔄", bot.user)
     except:

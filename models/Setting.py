@@ -10,3 +10,7 @@ class Setting(db.Model):
     value = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone))
     updatedAt = db.Column(db.DateTime, default=datetime.now(timezone), onupdate=datetime.now(timezone))
+
+    def __init__(self, key="", value=""):
+        self.key = key
+        self.value = value

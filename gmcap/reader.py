@@ -2,7 +2,7 @@ from repositories.SettingRepository import SettingRepository
 from repositories.ChannelRepository import ChannelRepository
 from repositories.RunnerRepository import RunnerRepository
 from discord.discordFunctions import replaceOffsetValues
-from logger.logger import log, HANDLE, DEBUG, DISCORD
+from logger.logger import log, HANDLE, DEBUG
 from models.Runner import Runner
 from constants import messages
 
@@ -86,20 +86,7 @@ def handle(runner, runnersMap, runnersToAdd, runnersToUpdate):
     else:
         runnersToAdd.append(runner)
     
-async def findHour(bot, a, b, c, offsets, i):
-    debug = settingRepository.getValue('Debug')
-    if debug == None:
-        log.error(DISCORD, messages.DEBUG_ERROR)
-        return
-    if debug.value == "1" and i==0 :
-        channelId = channelRepository.getChannelId("Debug")
-        if channelId == None:
-            log.error(DISCORD, messages.CHANNEL_ERROR)
-            return
-        channel = bot.get_channel(channelId)
-        message = replaceOffsetValues(messages.OFFSETS, [a, b, c])
-        await channel.send(message)
-        log.info(DEBUG, message)
+async def findHour(a, b, c, offsets):
     if a==0 and b==0 and c==0 : return None
     if a==offsets[0] and b==offsets[1] and c==offsets[2] : return None
     heures = 0
@@ -145,6 +132,16 @@ def getUpdateValue(runner, runnerInDB):
         'oriol': runner.oriol or runnerInDB.oriol
     }
 
+async def handleDebug(bot, a, b, c):
+    channelId = channelRepository.getChannelId("Debug")
+    if channelId == None:
+        log.error(HANDLE, messages.CHANNEL_ERROR)
+        return
+    channel = bot.get_channel(channelId)
+    message = replaceOffsetValues(messages.OFFSETS, [a, b, c])
+    await channel.send(message)
+    log.info(DEBUG, message)
+
 async def handleFile(bot, filename):
     with open(filename, 'rb') as file:
         eatUntil(file, [b'\x00']*100)
@@ -157,6 +154,10 @@ async def handleFile(bot, filename):
         if offsetsInDb == None:
             log.error(HANDLE, messages.ERROR_OFFSET)
             return None
+        debug = settingRepository.getValue('Debug')
+        if debug == None:
+            log.error(HANDLE, messages.DEBUG_ERROR)
+            return
         offsets = list(map(int, offsetsInDb.value.split(",")))
         runnersMap = createRunnersMap()
         runnersToAdd = []
@@ -177,7 +178,10 @@ async def handleFile(bot, filename):
             a = readIntWithFixLen(file, 2)
             b = readIntWithFixLen(file, 2)
             c = readIntWithFixLen(file, 2)
-            runnerTime = await findHour(bot, a, b, c, offsets, i)
+            if debug.value == "1":
+                await handleDebug(bot, a, b, c)
+                return
+            runnerTime = await findHour(a, b, c, offsets)
             file.read(66)
             for j in range(2):
                 readWithLen(file) # Skip

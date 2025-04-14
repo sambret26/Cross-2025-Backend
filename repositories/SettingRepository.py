@@ -2,6 +2,12 @@ from models.Setting import Setting
 from database import db
 
 class SettingRepository:
+    # ADDERS
+    @staticmethod
+    def addValue(key, value):
+        newSetting = Setting(key=key, value=value)
+        db.session.add(newSetting)
+        db.session.commit()
 
     # GETTERS
     @staticmethod
