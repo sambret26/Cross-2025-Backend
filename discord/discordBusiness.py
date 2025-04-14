@@ -134,7 +134,6 @@ async def debug(ctx, args):
         await ctx.send(messages.DEBUG_OFF)
         return
     await ctx.send(messages.INVALID_DEBUG)
-    return
 
 async def cmd(ctx):
     await ctx.send(messages.CMD)
@@ -145,15 +144,15 @@ async def clear(ctx, nombre):
 async def sendFirstReact(message):
     try:
         await message.add_reaction("🔄")
-    except:
-        None
+    except Exception as e:
+        log.error(DISCORD, e)
 
 async def sendSecondReact(bot, message):
     try:
         await message.remove_reaction("🔄", bot.user)
-    except:
-        None
+    except Exception as e:
+        log.error(DISCORD, e)
     try:
         await message.add_reaction("✅")
-    except:
-        None
+    except Exception as e:
+        log.error(DISCORD, e)

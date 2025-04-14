@@ -22,12 +22,8 @@ def createWordFile(rewards):
             oldTextList.append("F" + category + sex)
             newTextList.append(runner.first_name)
         if runner.time != "":
+            time = getTimeValue(runner.time)
             oldTextList.append("T" + category + sex)
-            time = runner.time
-            if "." in runner.time:
-                time = runner.time.split(".")[0]
-            if time.startswith("00:"):
-                time = time[3:]
             newTextList.append(time)
     replaceTextInDocument(oldTextList, newTextList)
 
@@ -58,3 +54,11 @@ def replaceFlagInXml(filePath, flag, value):
         if elem.text and flag in elem.text:
             elem.text = elem.text.replace(flag, str(value) if value != None else "")
     tree.write(filePath)
+
+def getTimeValue(fullTime):
+    time = fullTime
+    if '.' in fullTime:
+        time = fullTime.split(".")[0]
+    if time.startswith("00:"):
+        time = time[3:]
+    return time

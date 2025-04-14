@@ -33,7 +33,7 @@ def eatZero(file):
             
 def eatN(file, n):
     value = ""
-    for i in range (n):
+    for _ in range (n):
         byte = file.read(1)
         if not byte : return -1
         value += chr(ord(byte))
@@ -41,7 +41,7 @@ def eatN(file, n):
 
 def eatIntN(file, n):
     value = ""
-    for i in range (n):
+    for _ in range (n):
         byte = file.read(1)
         if not byte : return -1
         value += str(ord(byte))
@@ -49,17 +49,17 @@ def eatIntN(file, n):
             
 def readWithLen(file):
     lenValue = file.read(1)
-    len = ord(lenValue)
-    return eatN(file, len)
+    length = ord(lenValue)
+    return eatN(file, length)
 
 def readIntWithLen(file):
     lenValue = file.read(1)
-    len = ord(lenValue)
-    return eatIntN(file, len)
+    length = ord(lenValue)
+    return eatIntN(file, length)
 
-def readIntWithFixLen(file, len):
+def readIntWithFixLen(file, length):
     value = 0
-    for compt in range (len):
+    for compt in range (length):
         value += eatIntN(file, 1) * (16**(compt*2))
     return value
 
@@ -142,6 +142,10 @@ async def handleDebug(bot, a, b, c):
     await channel.send(message)
     log.info(DEBUG, message)
 
+def readMultiple(file, number):
+    for _ in range(number):
+        readWithLen(file) # Skip
+
 async def handleFile(bot, filename):
     with open(filename, 'rb') as file:
         eatUntil(file, [b'\x00']*100)
@@ -162,7 +166,7 @@ async def handleFile(bot, filename):
         runnersMap = createRunnersMap()
         runnersToAdd = []
         runnersToUpdate = []
-        for i in range(number):
+        for _ in range(number):
             last_name = readWithLen(file).upper()
             first_name = readWithLen(file).title()
             sex = getSex(eatIntN(file, 1))
@@ -173,8 +177,7 @@ async def handleFile(bot, filename):
             file.read(1) # Skip
             readWithLen(file) # Skip
             readIntWithFixLen(file, 2)
-            for j in range(4):
-                readWithLen(file) # Skip
+            readMultiple(file, 4)
             a = readIntWithFixLen(file, 2)
             b = readIntWithFixLen(file, 2)
             c = readIntWithFixLen(file, 2)
@@ -183,21 +186,17 @@ async def handleFile(bot, filename):
                 return
             runnerTime = await findHour(a, b, c, offsets)
             file.read(66)
-            for j in range(2):
-                readWithLen(file) # Skip
+            readMultiple(file, 2)
             file.read(8)
-            for j in range(5):
-                readWithLen(file) # Skip
+            readMultiple(file, 5)
             file.read(20)
             ranking = readIntWithFixLen(file,2)
             category_ranking = readIntWithFixLen(file,2)
             sex_ranking = readIntWithFixLen(file,2)
-            for j in range(2):
-                readWithLen(file) # Skip
+            readMultiple(file, 2)
             file.read(1)
             organism = readWithLen(file) #Skip
-            for j in range(3):
-                readWithLen(file) # Skip
+            readMultiple(file, 3)
             file.read(6)
             readWithLen(file)
             file.read(3)

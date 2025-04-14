@@ -16,6 +16,7 @@ BOT = '[BOT]'
 
 class Log:
     def __init__(self):
+        # Useless constructor
         pass
 
     def info(self, logType, message):

@@ -115,12 +115,16 @@ def getRewards():
 
 def getValues(reward):
     r = reward[1]
-    time = r.time
-    if "." in r.time:
-        time = r.time.split(".")[0]
+    time = getTimeValue(r.time)
+    return (reward[0], r.sex, r.ranking, r.last_name, r.first_name, r.bib_number, time)
+
+def getTimeValue(fullTime):
+    time = fullTime
+    if '.' in fullTime:
+        time = fullTime.split(".")[0]
     if time.startswith("00:"):
         time = time[3:]
-    return (reward[0], r.sex, r.ranking, r.last_name, r.first_name, r.bib_number, time)
+    return time
 
 def isCorrectEmail(adress):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -144,12 +148,12 @@ def getOffsetsFromArgs(args):
             if len(offsets) != 3:
                 return None
             return [int(offset) for offset in offsets]
-        except:
+        except Exception as _:
             return None
     if len(args) == 3:
         try:
             return [int(arg) for arg in args]
-        except:
+        except Exception as _:
             return None
     return None
 
