@@ -31,7 +31,7 @@ class Runner(db.Model):
         self.time = time
         self.oriol = oriol
 
-    def toDictForUpdate(self):
+    def toDict(self):
         return {
             'first_name': self.first_name,
             'last_name': self.last_name,

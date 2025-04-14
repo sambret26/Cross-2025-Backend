@@ -9,8 +9,12 @@ class RunnerRepository:
         return Runner.query.count()
 
     @staticmethod
-    def getRunnersForMap():
+    def getRunners():
         return Runner.query.all()
+
+    @staticmethod
+    def getByBibNumber(bibNumber):
+        return Runner.query.filter_by(bib_number=bibNumber).first()
 
     @staticmethod
     def getRewardInScratch(ranking, sex):

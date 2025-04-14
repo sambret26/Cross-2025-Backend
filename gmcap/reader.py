@@ -111,7 +111,7 @@ async def findHour(a, b, c, offsets):
     return(f'{heures:02}:{minutes:02}:{secondes:02}.{milisecondes:03}')
 
 def createRunnersMap():
-    runnersInDB = runnerRepository.getRunnersForMap()
+    runnersInDB = runnerRepository.getRunners()
     runnersMap = {}
     for runner in runnersInDB:
         runnersMap[runner.last_name + "_" + runner.first_name] = runner
